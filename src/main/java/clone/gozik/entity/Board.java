@@ -34,7 +34,7 @@ public class Board {
     private String nickname;
 
     @Column
-    private CompanyTypeEnum companyType;
+    private String companyType;
 
     @Column
     private RecruitTypeEnum recruitmentperiod;

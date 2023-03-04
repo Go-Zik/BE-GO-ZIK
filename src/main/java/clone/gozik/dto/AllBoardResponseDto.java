@@ -27,7 +27,7 @@ public class AllBoardResponseDto {
         this.startDate = board.getStartDate();
         this.lastDate = board.getLastDate();
         this.recruitmentPeriod = board.getRecruitmentperiod();
-        this.companyType = board.getCompanyType();
+//        this.companyType = board.getCompanyType();
         this.viewCount = board.getViewCount();
         this.incruteType = incruteType;
     }

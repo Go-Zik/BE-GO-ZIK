@@ -8,6 +8,7 @@ import clone.gozik.entity.Member;
 import clone.gozik.entity.RecruitTypeEnum;
 import clone.gozik.repository.BoardRepository;
 import clone.gozik.repository.JobRepository;
+import clone.gozik.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private  final JobRepository jobRepository;
 
-    //private final MemberRepository memberrepository;
+    private final MemberRepository memberrepository;
 
     private final S3Uploader s3Uploader;
 
@@ -88,16 +89,15 @@ public class BoardService {
         String imageurl = s3Uploader.upload(image, "image");
         String logourl = s3Uploader.upload(logo, "logo");
 
-        LocalDate startDate = extractDate(requestBoardDto.getStartDate());//String에서 날짜추출
-        if(requestBoardDto.isRecruitmentPeriod()){
-            Board board = new Board(requestBoardDto,nickname,startDate,member,imageurl,logourl);
-            boardRepository.save(board);
-        }else{
-            LocalDate lastDate = extractDate(requestBoardDto.getEndDate());
-            Board board = new Board(requestBoardDto,nickname,lastDate,startDate,member,imageurl,logourl);
-            boardRepository.save(board);
-        }
-
+//        LocalDate startDate = extractDate(requestBoardDto.getStartDate());//String에서 날짜추출
+//        if(requestBoardDto.isRecruitmentPeriod()){
+//            Board board = new Board(requestBoardDto,nickname,startDate,member,imageurl,logourl);
+//            boardRepository.save(board);
+//        }else{
+//            LocalDate lastDate = extractDate(requestBoardDto.getEndDate());
+//            Board board = new Board(requestBoardDto,nickname,lastDate,startDate,member,imageurl,logourl);
+//            boardRepository.save(board);
+//        }
 
     }
 
@@ -121,15 +121,15 @@ public class BoardService {
             logourl = s3Uploader.upload(logo, "logo");
         }
 
-        LocalDate startDate = extractDate(boardRequestDto.getStartDate());//String에서 날짜추출
-        if(boardRequestDto.isRecruitmentPeriod()){
-            board.update(boardRequestDto,startDate,member,imageurl,logourl);
-            boardRepository.save(board);
-        }else{
-            LocalDate lastDate = extractDate(boardRequestDto.getEndDate());
-             board.update(boardRequestDto,lastDate,startDate,member,imageurl,logourl);
-            boardRepository.save(board);
-        }
+//        LocalDate startDate = extractDate(boardRequestDto.getStartDate());//String에서 날짜추출
+//        if(boardRequestDto.isRecruitmentPeriod()){
+//            board.update(boardRequestDto,startDate,member,imageurl,logourl);
+//            boardRepository.save(board);
+//        }else{
+//            LocalDate lastDate = extractDate(boardRequestDto.getEndDate());
+//             board.update(boardRequestDto,lastDate,startDate,member,imageurl,logourl);
+//            boardRepository.save(board);
+//        }
     }
 
     @Transactional
