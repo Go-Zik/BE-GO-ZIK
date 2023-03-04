@@ -16,6 +16,11 @@ import java.util.List;
 public class BoardController {
     private BoardService boardService;
 
+    @GetMapping("/main")
+    public List mainpage(){
+        return boardService.mainBoard();
+    }
+
     @GetMapping("/recruit")
     public List recruitget(){
         return boardService.allBoard();
