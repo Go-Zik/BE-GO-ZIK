@@ -38,21 +38,29 @@ public class MemberService {
     public void signup(MemberDto.JoinRequestDto JoinRequest) {
         String email = JoinRequest.getEmail();
         String password = JoinRequest.getPassword();
-
-//        String nickName = JoinRequest.getNickName();
-        //닉네임 지어주기 + 중복확인
+        MemberRoleEnum role = JoinRequest.getRole();
         String nickName = "";
-        while (true){
-            nickName = randomNicknameBox.GetPrefix()+ " "+randomNicknameBox.GetSuffix();
-            if(!memberRepository.findByNickName(nickName).isPresent()){
-                break;
+
+
+        if (role.equals(MemberRoleEnum.COMPANY)) {
+            nickName = JoinRequest.getNickName();
+            if (memberRepository.findByNickName(nickName).isPresent()) {
+                throw new IllegalArgumentException("중복된 회사명이 있습니다");
+            }
+        } else  //닉네임 지어주기 + 중복확인
+        {
+            while (true) {
+                nickName = randomNicknameBox.GetPrefix() + " " + randomNicknameBox.GetSuffix();
+                if (!memberRepository.findByNickName(nickName).isPresent()) {
+                    break;
+                }
             }
         }
-        MemberRoleEnum role = JoinRequest.getRole();
-
-        //중복확인
         Optional<Member> memberOptional = memberRepository.findByEmail(email);
-        if(memberOptional.isPresent()){
+
+
+        //이메일 중복확인
+        if (memberOptional.isPresent()) {
             throw new IllegalArgumentException("중복된 이메일이 있습니다");
         }
 
@@ -71,16 +79,17 @@ public class MemberService {
         String password = loginRequest.getPassword();
 
         Optional<Member> memberOptional = memberRepository.findByEmail(email);
-        if(memberOptional.isEmpty()){
+        if (memberOptional.isEmpty()) {
             throw new IllegalArgumentException("아이디가 없습니다.");
         }
 
-        if(!password.equals(memberOptional.get().getPassword())){
+        if (!password.equals(memberOptional.get().getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         HttpHeaders headers = new HttpHeaders();
         headers.set(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(memberOptional.get().getEmail(), memberOptional.get().getRole()));
     }
+
     public String kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
@@ -92,11 +101,12 @@ public class MemberService {
         Member kakaoUser = registerKakaoUserIfNeeded(kakaoMemberInfo);
 
         // 4. JWT 토큰 반환
-        String createToken =  jwtUtil.createToken(kakaoUser.getEmail(), kakaoUser.getRole());
+        String createToken = jwtUtil.createToken(kakaoUser.getEmail(), kakaoUser.getRole());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
         return createToken;
     }
+
     // 1. "인가 코드"로 "액세스 토큰" 요청
     private String getToken(String code) throws JsonProcessingException {
         // HTTP Header 생성
@@ -127,6 +137,7 @@ public class MemberService {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         return jsonNode.get("access_token").asText();
     }
+
     // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
     private MemberDto.KakaoMemberInfoDto getKakaoMemberInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
@@ -154,6 +165,7 @@ public class MemberService {
                 .get("email").asText();
         return new MemberDto.KakaoMemberInfoDto(id, email);
     }
+
     // 3. 필요시에 회원가입
     private Member registerKakaoUserIfNeeded(MemberDto.KakaoMemberInfoDto kakaoUserInfo) {
         // DB 에 중복된 Kakao Id 가 있는지 확인
@@ -174,7 +186,12 @@ public class MemberService {
                 String password = UUID.randomUUID().toString();
 //                String encodedPassword = passwordEncoder.encode(password);
                 String nickName = " ";
-
+                while (true) {
+                    nickName = randomNicknameBox.GetPrefix() + " " + randomNicknameBox.GetSuffix();
+                    if (!memberRepository.findByNickName(nickName).isPresent()) {
+                        break;
+                    }
+                }
                 // email: kakao email
                 String email = kakaoUserInfo.getEmail();
 
