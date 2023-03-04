@@ -2,12 +2,12 @@ package clone.gozik.service;
 
 import clone.gozik.S3.S3Uploader;
 import clone.gozik.dto.*;
-import clone.gozik.entity.Board;
-import clone.gozik.entity.Job;
-import clone.gozik.entity.Member;
-import clone.gozik.entity.RecruitTypeEnum;
+import clone.gozik.entity.*;
 import clone.gozik.repository.BoardRepository;
 import clone.gozik.repository.JobRepository;
+import clone.gozik.repository.LogoAndImageRepository;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -30,6 +30,8 @@ public class BoardService {
     private  final JobRepository jobRepository;
 
     //private final MemberRepository memberrepository;
+
+    private final LogoAndImageRepository logoAndImageRepository;
 
     private final S3Uploader s3Uploader;
 
@@ -85,20 +87,36 @@ public class BoardService {
         Member member = new Member();//임시멤버, 멤버 리포지토리 구현시 제거
         //임시코드1은 여기까지
         //파일 저장하며 url 받아오기
-        String imageurl = s3Uploader.upload(image, "image");
-        String logourl = s3Uploader.upload(logo, "logo");
+        String imageurl = "";
+        String logourl = "";
+
+        List<String> logodata = new ArrayList<>();
+        List<String> imagedata = new ArrayList<>();
+        if (logo.equals(null)){ //로고 안넣은 경우
+            logourl = "";
+        }else {                 //로고 넣은 경우
+            logodata = s3Uploader.upload(logo,"logo");
+            logourl = logodata.get(1);
+        }
+
+        if (logo.equals(null)){ //이미지 안넣은 경우
+            logourl = "";
+        }else {                 //이미지 넣은 경우
+            imagedata = s3Uploader.upload(image,"image");
+            imageurl = imagedata.get(1);
+        }
 
         LocalDate startDate = extractDate(requestBoardDto.getStartDate());//String에서 날짜추출
         if(requestBoardDto.isRecruitmentPeriod()){
             Board board = new Board(requestBoardDto,nickname,startDate,member,imageurl,logourl);
             boardRepository.save(board);
+            logoAndImageRepository.save(new LogoAndImage(logodata, imagedata, board));
         }else{
             LocalDate lastDate = extractDate(requestBoardDto.getEndDate());
             Board board = new Board(requestBoardDto,nickname,lastDate,startDate,member,imageurl,logourl);
             boardRepository.save(board);
+            logoAndImageRepository.save(new LogoAndImage(logodata, imagedata, board));
         }
-
-
     }
 
     @Transactional
@@ -110,16 +128,48 @@ public class BoardService {
         //임시코드2는 여기까지
         String imageurl = "";
         String logourl = "";
-        if (image.equals("")||image.equals(board.getImage())){
-            imageurl = board.getImage();
-        }else {
-            imageurl = s3Uploader.upload(image, "image");
+
+        LogoAndImage logoAndImage = logoAndImageRepository.findByBoardId(id)
+                .orElseThrow(()->new IllegalArgumentException("해당 게시글에는 로고와이미지가 없습니다."));
+
+
+        List<String> logodata = new ArrayList<>();
+        List<String> imagedata = new ArrayList<>();
+        if (logo.equals(null)){ //로고를 없애고 싶은 경우
+            logourl = "";
+        }else {                 //로고를 바꾸거나 원래 있었던 걸로 하고 싶은 경우
+            //기존 logo 파일 삭제
+            String deletelogokey = logoAndImage.getLogoKey();
+            final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(region).build();
+            try{
+                s3.deleteObject(bucket,deletelogokey);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            //새 로고 파일 등록
+            logodata = s3Uploader.upload(logo,"logo");
+            logoAndImage.updatelogo(logodata);
+            logourl = logodata.get(1);
         }
-        if (logo.equals("")||logo.equals(board.getLogo())){
-            logourl = board.getLogo();
-        }else {
-            logourl = s3Uploader.upload(logo, "logo");
+
+        if (image.equals(null)){ //이미지를 없애고 싶은 경우
+            imageurl = "";
+        }else {                 //이미지를 바꾸거나 원래 있었던 걸로 하고 싶은 경우
+            //기존 image 파일 삭제
+            String deleteimagekey = logoAndImage.getImageKey();
+            final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(region).build();
+            try{
+                s3.deleteObject(bucket,deleteimagekey);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            //새 이미지 파일 등록
+            imagedata = s3Uploader.upload(image,"image");
+            logoAndImage.updateimage(imagedata);
+            imageurl = imagedata.get(1);
         }
+
+
 
         LocalDate startDate = extractDate(boardRequestDto.getStartDate());//String에서 날짜추출
         if(boardRequestDto.isRecruitmentPeriod()){
