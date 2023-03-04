@@ -1,10 +1,10 @@
 package clone.gozik.service;
 
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class RandomNicknameBox {
-
-
-
     private String[] prefix = {
             "불가능한","어질어질한","앙탈부리는","금쪽같은","아름다운",
             "코드짜는","심심한","시시한","탐나는","질투심많은",

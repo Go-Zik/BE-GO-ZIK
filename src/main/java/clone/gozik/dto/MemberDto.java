@@ -3,7 +3,6 @@ package clone.gozik.dto;
 import clone.gozik.entity.MemberRoleEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.intellij.lang.annotations.Pattern;
 
 public class MemberDto {
     @Getter
