@@ -1,6 +1,7 @@
 package clone.gozik.controller;
 //import clone.gozic.jwt.JwtUtil;
 import clone.gozik.dto.MemberDto;
+import clone.gozik.dto.TestDto;
 import clone.gozik.jwt.JwtUtil;
 import clone.gozik.service.MemberService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,9 +14,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member")
+@RequestMapping("/api/user")
 public class MemberController {
     private final MemberService memberService;
 
@@ -57,8 +58,12 @@ public class MemberController {
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        return "redirect:/api/member/shop";
+        return "redirect:/api/user/shop";
     }
 
+    @GetMapping("/test")
+    public TestDto test(){
+        return new TestDto("성공","200");
+    }
 }
 
