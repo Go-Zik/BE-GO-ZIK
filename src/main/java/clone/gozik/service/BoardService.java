@@ -1,5 +1,6 @@
 package clone.gozik.service;
 
+import clone.gozik.S3.S3Uploader;
 import clone.gozik.dto.*;
 import clone.gozik.entity.Board;
 import clone.gozik.entity.Job;
@@ -8,6 +9,7 @@ import clone.gozik.entity.RecruitTypeEnum;
 import clone.gozik.repository.BoardRepository;
 import clone.gozik.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +27,14 @@ public class BoardService {
     private  final JobRepository jobRepository;
 
     //private final MemberRepository memberrepository;
+
+    private final S3Uploader s3Uploader;
+
+    @Value("gozik")
+    private String bucket;
+
+    @Value("ap-northeast-2")
+    private String region;
 
 
 
@@ -60,9 +70,15 @@ public class BoardService {
         //임시 코드 1 > 구현시 모두 제거
         String nickname = "임시닉네임 로그인구현시 변경";
         Member member = new Member();//임시멤버, 멤버 리포지토리 구현시 제거
-        String imageurl = "임시이미지 url";
-        String logourl = "로고 url";
+
+//        String imageurl = "임시이미지 url";
+//        String logourl = "로고 url";
         //임시코드1은 여기까지
+
+        //파일 저장하며 url 받아오기
+        String imageurl = s3Uploader.upload(image, "image");
+        String logourl = s3Uploader.upload(logo, "logo");
+
         LocalDate startDate = extractDate(requestBoardDto.getStartDate());//String에서 날짜추출
         if(requestBoardDto.isRecruitmentPeriod()){
             Board board = new Board(requestBoardDto,nickname,startDate,member,imageurl,logourl);
@@ -72,6 +88,8 @@ public class BoardService {
             Board board = new Board(requestBoardDto,nickname,lastDate,startDate,member,imageurl,logourl);
             boardRepository.save(board);
         }
+
+
     }
 
     @Transactional
@@ -80,9 +98,22 @@ public class BoardService {
         //임시 코드 2 > 구현시 모두 제거
         String nickname = "임시닉네임 로그인구현시 변경";
         Member member = new Member();//임시멤버, 멤버 리포지토리 구현시 제거
-        String imageurl = "임시이미지 url";
-        String logourl = "로고 url";
+        String imageurl = "";
+        String logourl = "";
         //임시코드2는 여기까지
+
+        if (image.equals("")||image.equals(board.getImage())){
+            imageurl = board.getImage();
+        }else {
+            imageurl = s3Uploader.upload(image, "image");
+        }
+        if (logo.equals("")||logo.equals(board.getLogo())){
+            logourl = board.getLogo();
+        }else {
+            logourl = s3Uploader.upload(logo, "logo");
+        }
+
+
         LocalDate startDate = extractDate(boardRequestDto.getStartDate());//String에서 날짜추출
         if(boardRequestDto.isRecruitmentPeriod()){
             board.update(boardRequestDto,startDate,member,imageurl,logourl);
