@@ -74,7 +74,7 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public void login(MemberDto.loginRequestDto loginRequest) {
+    public void login(MemberDto.loginRequestDto loginRequest, HttpServletResponse response) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
 
@@ -86,8 +86,7 @@ public class MemberService {
         if (!password.equals(memberOptional.get().getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(memberOptional.get().getEmail(), memberOptional.get().getRole()));
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(memberOptional.get().getEmail(), memberOptional.get().getRole()));
     }
 
     public String kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {

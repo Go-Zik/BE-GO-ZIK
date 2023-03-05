@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Slf4j
@@ -27,7 +28,7 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String upload(MultipartFile multipartFile, String dirName){
+    public ArrayList<String> upload(MultipartFile multipartFile, String dirName){
 
         try{
             File uploadFile = convert(multipartFile)
@@ -50,7 +51,7 @@ public class S3Uploader {
         return Optional.empty();
     }
 
-    private String upload(File uploadFile, String dirName){
+    private ArrayList<String> upload(File uploadFile, String dirName){
 
         String fileName = dirName +"/" +uploadFile.getName();
         log.info("key : "+fileName);
@@ -60,7 +61,10 @@ public class S3Uploader {
 
         removeNewFile(uploadFile);
 
-        return uploadImageUrl;
+        ArrayList<String> results = new ArrayList<>();
+        results.add(fileName);
+        results.add(uploadImageUrl);
+        return results;
     }
 
     private String putS3(File uploadFile, String fileName){
