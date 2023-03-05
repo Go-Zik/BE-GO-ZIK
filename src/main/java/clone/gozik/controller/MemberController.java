@@ -33,8 +33,8 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody MemberDto.loginRequestDto loginRequest){
-        memberService.login(loginRequest);
+    public String login(@RequestBody MemberDto.loginRequestDto loginRequest, HttpServletResponse response){
+        memberService.login(loginRequest, response);
         return "로그인 성공";
     }
     @GetMapping("/login")
