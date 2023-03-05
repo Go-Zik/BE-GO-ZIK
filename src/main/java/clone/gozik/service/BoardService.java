@@ -88,6 +88,7 @@ public class BoardService {
         Member member = new Member();//임시멤버, 멤버 리포지토리 구현시 제거
         //임시코드1은 여기까지
         //파일 저장하며 url 받아오기
+        Board board = null;
         String imageurl = "";
         String logourl = "";
 
@@ -107,16 +108,18 @@ public class BoardService {
             imageurl = imagedata.get(1);
         }
 
-        LocalDate startDate = extractDate(requestBoardDto.getStartDate());//String에서 날짜추출
-        if(requestBoardDto.isRecruitmentPeriod()){
-            Board board = new Board(requestBoardDto,nickname,startDate,member,imageurl,logourl);
-            boardRepository.save(board);
-            logoAndImageRepository.save(new LogoAndImage(logodata, imagedata, board));
+        LocalDate startDate = extractDate(requestBoardDto.getStartdate());//String에서 날짜추출
+        if(requestBoardDto.isRecruitmentperiod()){
+            board = new Board(requestBoardDto,nickname,startDate,member,imageurl,logourl);
         }else{
-            LocalDate lastDate = extractDate(requestBoardDto.getEndDate());
-            Board board = new Board(requestBoardDto,nickname,lastDate,startDate,member,imageurl,logourl);
-            boardRepository.save(board);
-            logoAndImageRepository.save(new LogoAndImage(logodata, imagedata, board));
+            LocalDate lastDate = extractDate(requestBoardDto.getEnddate());
+            board = new Board(requestBoardDto,nickname,lastDate,startDate,member,imageurl,logourl);;
+        }
+        boardRepository.save(board);
+        logoAndImageRepository.save(new LogoAndImage(logodata, imagedata, board));
+        List<RequestJobDto> jobs = requestBoardDto.getJob();
+        for (RequestJobDto jobDto : jobs) {
+            jobRepository.save(new Job(jobDto,board));
         }
     }
 
@@ -130,6 +133,11 @@ public class BoardService {
         String imageurl = "";
         String logourl = "";
 
+        jobRepository.deleteByBoard(board);//기존 보드와 연결된 job를 지우고 다시 작성하는 코드
+        List<RequestJobDto> jobs = boardRequestDto.getJob();
+        for (RequestJobDto jobDto : jobs) {
+            jobRepository.save(new Job(jobDto,board));
+        }
         LogoAndImage logoAndImage = logoAndImageRepository.findByBoardId(id)
                 .orElseThrow(()->new IllegalArgumentException("해당 게시글에는 로고와이미지가 없습니다."));
 
@@ -170,14 +178,12 @@ public class BoardService {
             imageurl = imagedata.get(1);
         }
 
-
-
-        LocalDate startDate = extractDate(boardRequestDto.getStartDate());//String에서 날짜추출
-        if(boardRequestDto.isRecruitmentPeriod()){
+        LocalDate startDate = extractDate(boardRequestDto.getStartdate());//String에서 날짜추출
+        if(boardRequestDto.isRecruitmentperiod()){
             board.update(boardRequestDto,startDate,member,imageurl,logourl);
             boardRepository.save(board);
         }else{
-            LocalDate lastDate = extractDate(boardRequestDto.getEndDate());
+            LocalDate lastDate = extractDate(boardRequestDto.getEnddate());
              board.update(boardRequestDto,lastDate,startDate,member,imageurl,logourl);
             boardRepository.save(board);
         }
