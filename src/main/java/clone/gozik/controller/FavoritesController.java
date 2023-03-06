@@ -1,9 +1,7 @@
 package clone.gozik.controller;
 
 
-import clone.gozik.dto.FavoritesResponseDto;
 import clone.gozik.dto.MessageDto;
-import clone.gozik.dto.OneBoardResponseDto;
 import clone.gozik.entity.Board;
 import clone.gozik.security.UserDetailsImpl;
 import clone.gozik.service.FavoritesService;
@@ -44,7 +42,7 @@ public class FavoritesController {
 
     //한 사람이 즐겨찾기 한 게시글 류
     @GetMapping("/member")
-    public List<Board> getboardmemberfavor(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public List getboardmemberfavor(@AuthenticationPrincipal UserDetailsImpl userDetails){
         return favoritesService.getmembersfavor(userDetails);
     }
 
