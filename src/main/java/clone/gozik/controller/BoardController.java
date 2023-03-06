@@ -40,9 +40,9 @@ public class BoardController {
             @RequestPart(value = "data") RequestBoardDto requestBoardDto,
             @RequestPart(value = "image") MultipartFile image,
             @RequestPart(value = "logo") MultipartFile logo
-            //            ,@AuthenticationPrincipal UserDetailsImpl userDetails
+            ,@AuthenticationPrincipal UserDetailsImpl userDetails
     )throws IOException {
-        return boardService.createBoard(requestBoardDto,image,logo);
+        return boardService.createBoard(requestBoardDto,image,logo,userDetails);
     }
 
     @PostMapping("/recruit/{id}")
@@ -51,18 +51,18 @@ public class BoardController {
             @RequestPart(value = "data") RequestBoardDto boardRequestDto,
             @RequestPart(value = "image") MultipartFile image,
             @RequestPart(value = "logo") MultipartFile logo
-            //,@AuthenticationPrincipal UserDetailsImpl userDetails
+            ,@AuthenticationPrincipal UserDetailsImpl userDetails
     )throws IOException {
 
-        return boardService.updateBoard(id,boardRequestDto,image,logo);
+        return boardService.updateBoard(id,boardRequestDto,image,logo,userDetails);
     }
 
     @PutMapping("/recruit/{id}")
     public ResponseEntity<MessageDto> recruitdone(
             @PathVariable Long id
-            //,@AuthenticationPrincipal UserDetailsImpl userDetails
+            ,@AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        return boardService.doneBoard(id);
+        return boardService.doneBoard(id,userDetails);
     }
 
     @DeleteMapping("/recruit/{id}")
