@@ -2,7 +2,10 @@ package clone.gozik.dto;
 
 import clone.gozik.entity.EmployeeType;
 import clone.gozik.entity.Job;
+import lombok.Getter;
 
+
+@Getter
 public class OneJobResponseDto {
     private EmployeeType imcruitType;
     private String jobDetail;

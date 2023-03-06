@@ -3,7 +3,7 @@ package clone.gozik.jwt;
 
 import clone.gozik.entity.MemberRoleEnum;
 
-import clone.gozik.security.UserDetailsServiceImpl;
+import clone.gozik.security.MemberDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -32,7 +33,7 @@ public class JwtUtil {
     private static final String BEARER_PREFIX = "Bearer ";
     private static final long TOKEN_TIME = 60 * 60 * 1000L;
 
-    private final UserDetailsServiceImpl userDetailsService;
+    private final MemberDetailsServiceImpl memberDetailsService;
 
     @Value("${jwt.secret.key}")
     private String secretKey;
@@ -108,8 +109,9 @@ public class JwtUtil {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
-    public UsernamePasswordAuthenticationToken createAuthentication(String email) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+    public Authentication createAuthentication(String email) {
+        UserDetails userDetails = memberDetailsService.loadUserByUsername(email);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

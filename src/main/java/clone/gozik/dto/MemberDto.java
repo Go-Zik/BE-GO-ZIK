@@ -12,7 +12,7 @@ public class MemberDto {
         private String nickName;
         private MemberRoleEnum role;
     }
-@Getter
+    @Getter
     public static class loginRequestDto{
         private String email;
         private String password;

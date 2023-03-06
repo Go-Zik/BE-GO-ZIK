@@ -16,7 +16,7 @@ public class S3Config {
     private String accessKey;
 
 
-    @Value("REGABSbmnr0nA1GdreZPm/iEF2/Sae9vSI04R3Om")
+    @Value("sREGABSbmnr0nA1GdreZPm/iEF2/Sae9vSI04R3Om")
     private String secretKey;
 
     @Value("ap-northeast-2")

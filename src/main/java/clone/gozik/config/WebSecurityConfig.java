@@ -23,7 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
+//@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig {
 
     private final JwtUtil jwtUtil;
@@ -52,18 +52,12 @@ public class WebSecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeRequests()
-//                .antMatchers("/api/user/**").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
-                .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                ;
 
         http.cors();    // corsConfigurationSource를 적용하기 위한 설정
-
-
-
-//        http.formLogin().loginPage("/api/user/login-page").permitAll();
-
-//        http.exceptionHandling().accessDeniedPage("/api/user/forbidden");
 
         return http.build();
     }

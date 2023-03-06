@@ -8,7 +8,7 @@ import clone.gozik.repository.BoardRepository;
 import clone.gozik.repository.JobRepository;
 import clone.gozik.repository.MemberRepository;
 import clone.gozik.repository.LogoAndImageRepository;
-import clone.gozik.security.UserDetailsImpl;
+import clone.gozik.security.MemberDetailsImpl;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ import static clone.gozik.entity.ErrorCode.UNREGISTER_EMAIL;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private  final JobRepository jobRepository;
+    private final JobRepository jobRepository;
 
     private final MemberRepository memberrepository;
 
@@ -88,8 +88,8 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<MessageDto> createBoard(RequestBoardDto requestBoardDto, MultipartFile image, MultipartFile logo,UserDetailsImpl userDetails) {
-        Member member = memberrepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+    public ResponseEntity<MessageDto> createBoard(MemberDetailsImpl memberDetails, RequestBoardDto requestBoardDto, MultipartFile image, MultipartFile logo) {
+        Member member = memberrepository.findByEmail(memberDetails.getMember().getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
         String nickname = member.getNickName();
         Board board = null;
         String imageurl = "";
@@ -129,9 +129,9 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<MessageDto> updateBoard(Long id, RequestBoardDto boardRequestDto, MultipartFile image, MultipartFile logo,UserDetailsImpl userDetails) {
+    public ResponseEntity<MessageDto> updateBoard(Long id, RequestBoardDto boardRequestDto, MultipartFile image, MultipartFile logo, MemberDetailsImpl memberDetails) {
         Board board =  boardRepository.findById(id).orElseThrow(()->new IllegalArgumentException("글이 존재하지 않습니다"));
-        Member member = memberrepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+        Member member = memberrepository.findByEmail(memberDetails.getMember().getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
         String imageurl = "";
         String logourl = "";
 
@@ -193,8 +193,8 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<MessageDto> doneBoard(Long id,UserDetailsImpl userDetails) {
-        Member member = memberrepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+    public ResponseEntity<MessageDto> doneBoard(Long id, MemberDetailsImpl memberDetails) {
+        Member member = memberrepository.findByEmail(memberDetails.getMember().getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
         Board board= boardRepository.findByIdAndMember(id,member).orElseThrow(()->new CustomException(ErrorCode.NULL_BOARD_DATA));
         if(board.getRecruitmentperiod()== RecruitTypeEnum.ONGOING)
             board.closed();
@@ -210,8 +210,8 @@ public class BoardService {
     }
 
 
-    public ResponseEntity<MessageDto> delete(Long id, UserDetailsImpl userDetails) {
-        Member member = memberrepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+    public ResponseEntity<MessageDto> delete(Long id, MemberDetailsImpl memberDetails) {
+        Member member = memberrepository.findByEmail(memberDetails.getMember().getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
         boardRepository.findByIdAndMember(id,member).orElseThrow(()->new CustomException(NULL_BOARD_DATA));
         boardRepository.deleteById(id);
         return ResponseEntity.ok()

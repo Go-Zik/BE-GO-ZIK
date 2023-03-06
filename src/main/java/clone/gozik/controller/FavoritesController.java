@@ -2,8 +2,7 @@ package clone.gozik.controller;
 
 
 import clone.gozik.dto.MessageDto;
-import clone.gozik.entity.Board;
-import clone.gozik.security.UserDetailsImpl;
+import clone.gozik.security.MemberDetailsImpl;
 import clone.gozik.service.FavoritesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,8 +22,8 @@ public class FavoritesController {
 
     //게시글을 즐겨찾기하거나 취소하기
     @PostMapping("/{boardid}")
-    public MessageDto favoritesOrCancle(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long boardid){
-        return favoritesService.doOrCancle(userDetails, boardid);
+    public MessageDto favoritesOrCancle(@AuthenticationPrincipal MemberDetailsImpl memberDetails, @PathVariable Long boardid){
+        return favoritesService.doOrCancle(memberDetails, boardid);
     }
 
     //게시글을 즐겨찾기 한 사람의 수
@@ -42,8 +41,8 @@ public class FavoritesController {
 
     //한 사람이 즐겨찾기 한 게시글 류
     @GetMapping("/member")
-    public List getboardmemberfavor(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return favoritesService.getmembersfavor(userDetails);
+    public List getboardmemberfavor(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        return favoritesService.getmembersfavor(memberDetails);
     }
 
 
