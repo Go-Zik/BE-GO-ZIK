@@ -1,11 +1,14 @@
 package clone.gozik.service;
 
 
+import clone.gozik.dto.AllBoardResponseDto;
+import clone.gozik.dto.AllJobResponseDto;
 import clone.gozik.dto.MessageDto;
 import clone.gozik.entity.*;
 import clone.gozik.exception.CustomException;
 import clone.gozik.repository.BoardRepository;
 import clone.gozik.repository.FavoritesRepository;
+import clone.gozik.repository.JobRepository;
 import clone.gozik.repository.MemberRepository;
 import clone.gozik.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +23,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FavoritesService {
 
-    MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
-    BoardRepository boardRepository;
+    private final BoardRepository boardRepository;
 
-    FavoritesRepository favoritesRepository;
+    private final FavoritesRepository favoritesRepository;
+    private  final JobRepository jobRepository;
 
 
     @Transactional
@@ -47,7 +51,7 @@ public class FavoritesService {
         }
     }
 
-
+    @Transactional
     public int favorites(Long boardid) {
 
         List<Favorites> favorites = favoritesRepository.findAllByBoardId(boardid);
@@ -57,12 +61,7 @@ public class FavoritesService {
         return count;
     }
 
-
-
-
-
-
-
+    @Transactional
     public HashMap<Long,Long> allfavor() {
 
         List<Favorites> allfavors = favoritesRepository.findAll();
@@ -79,14 +78,20 @@ public class FavoritesService {
 
         return boardAndCount;
     }
-
-    public List<Board> getmembersfavor(UserDetailsImpl userDetails) {
+    @Transactional
+    public List getmembersfavor(UserDetailsImpl userDetails) {
 
         List<Favorites> membersfavors = favoritesRepository.findAllByMember_Id(userDetails.getUser().getId());
 
-        List<Board> memberfavorboards = new ArrayList<>();
+        List<AllBoardResponseDto> memberfavorboards = new ArrayList<>();
         for (Favorites i : membersfavors) {
-            memberfavorboards.add(i.getBoard());
+            List<Job> jobList = jobRepository.findByBoard(i.getBoard());
+            List<AllJobResponseDto> jobResponse = new ArrayList<>();
+            for (Job job : jobList) {
+                jobResponse.add(new AllJobResponseDto(job));
+            }
+            memberfavorboards.add(new AllBoardResponseDto(i.getBoard(),jobResponse));
+
         }
         return memberfavorboards;
 
