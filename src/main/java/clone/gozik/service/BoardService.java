@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -82,7 +83,7 @@ public class BoardService {
     }
 
     @Transactional
-    public void createBoard(RequestBoardDto requestBoardDto, MultipartFile image, MultipartFile logo) {
+    public ResponseEntity<MessageDto> createBoard(RequestBoardDto requestBoardDto, MultipartFile image, MultipartFile logo) {
         //임시 코드 1 > 구현시 모두 제거
         String nickname = "임시닉네임 로그인구현시 변경";
         Member member = new Member();//임시멤버, 멤버 리포지토리 구현시 제거
@@ -95,14 +96,14 @@ public class BoardService {
         List<String> logodata = new ArrayList<>();
         List<String> imagedata = new ArrayList<>();
         if (logo.equals(null)){ //로고 안넣은 경우
-            logourl = "";
+            throw new CustomException(ErrorCode.NULL_IMAGE_DATA);
         }else {                 //로고 넣은 경우
             logodata = s3Uploader.upload(logo,"logo");
             logourl = logodata.get(1);
         }
 
         if (logo.equals(null)){ //이미지 안넣은 경우
-            logourl = "";
+            throw new CustomException(ErrorCode.NULL_IMAGE_DATA);
         }else {                 //이미지 넣은 경우
             imagedata = s3Uploader.upload(image,"image");
             imageurl = imagedata.get(1);
@@ -121,10 +122,12 @@ public class BoardService {
         for (RequestJobDto jobDto : jobs) {
             jobRepository.save(new Job(jobDto,board));
         }
+        return ResponseEntity.ok()
+                .body(MessageDto.of(SuccessCode.BLOG_POST_SUCCESS));
     }
 
     @Transactional
-    public void updateBoard(Long id, RequestBoardDto boardRequestDto, MultipartFile image, MultipartFile logo) {
+    public ResponseEntity<MessageDto> updateBoard(Long id, RequestBoardDto boardRequestDto, MultipartFile image, MultipartFile logo) {
         Board board =  boardRepository.findById(id).orElseThrow(()->new IllegalArgumentException("글이 존재하지 않습니다"));
         //임시 코드 2 > 구현시 모두 제거
         String nickname = "임시닉네임 로그인구현시 변경";
@@ -139,7 +142,8 @@ public class BoardService {
             jobRepository.save(new Job(jobDto,board));
         }
         LogoAndImage logoAndImage = logoAndImageRepository.findByBoardId(id)
-                .orElseThrow(()->new IllegalArgumentException("해당 게시글에는 로고와이미지가 없습니다."));
+                .orElseThrow(()->new CustomException(ErrorCode.NULL_IMAGE_DATA));
+
 
 
         List<String> logodata = new ArrayList<>();
@@ -153,7 +157,7 @@ public class BoardService {
             try{
                 s3.deleteObject(bucket,deletelogokey);
             }catch (Exception e){
-                e.printStackTrace();
+                throw new CustomException(ErrorCode.NULL_IMAGE_DATA);
             }
             //새 로고 파일 등록
             logodata = s3Uploader.upload(logo,"logo");
@@ -187,16 +191,21 @@ public class BoardService {
              board.update(boardRequestDto,lastDate,startDate,member,imageurl,logourl);
             boardRepository.save(board);
         }
+        return ResponseEntity.ok()
+                .body(MessageDto.of(SuccessCode.BLOG_PUT_SUCCESS));
     }
 
     @Transactional
-    public void doneBoard(Long id) {
-        Board board= boardRepository.findById(id).orElseThrow(()->new IllegalArgumentException("글이 존재하지 않습니다"));
+    public ResponseEntity<MessageDto> doneBoard(Long id) {
+        Board board= boardRepository.findById(id).orElseThrow(
+                ()->new CustomException(ErrorCode.NULL_BOARD_DATA));
         if(board.getRecruitmentperiod()== RecruitTypeEnum.ONGOING)
             board.closed();
         else{
-            throw new IllegalArgumentException("수시채용이 아닙니다");
+            throw new CustomException(ErrorCode.NOT_RECRUIT_TYPE);
         }
+        return ResponseEntity.ok()
+                .body(MessageDto.of(SuccessCode.BLOG_DELETE_SUCCESS));
     }
 
     private LocalDate extractDate(String date){

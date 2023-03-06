@@ -1,8 +1,8 @@
 package clone.gozik.service;
 
 import clone.gozik.dto.MemberDto;
-import clone.gozik.entity.Member;
-import clone.gozik.entity.MemberRoleEnum;
+import clone.gozik.dto.MessageDto;
+import clone.gozik.entity.*;
 import clone.gozik.jwt.JwtUtil;
 import clone.gozik.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 //import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,13 +32,12 @@ public class MemberService {
     private final JwtUtil jwtUtil;
     private final RandomNicknameBox randomNicknameBox;
 
-
-//    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void signup(MemberDto.JoinRequestDto JoinRequest) {
+    public ResponseEntity<MessageDto> signup(MemberDto.JoinRequestDto JoinRequest) {
         String email = JoinRequest.getEmail();
-        String password = JoinRequest.getPassword();
+        String password = passwordEncoder.encode(JoinRequest.getPassword());
         MemberRoleEnum role = JoinRequest.getRole();
         String nickName = "";
 
@@ -45,7 +45,7 @@ public class MemberService {
         if (role.equals(MemberRoleEnum.COMPANY)) {
             nickName = JoinRequest.getNickName();
             if (memberRepository.findByNickName(nickName).isPresent()) {
-                throw new IllegalArgumentException("중복된 회사명이 있습니다");
+                throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
             }
         } else  //닉네임 지어주기 + 중복확인
         {
@@ -58,10 +58,9 @@ public class MemberService {
         }
         Optional<Member> memberOptional = memberRepository.findByEmail(email);
 
-
         //이메일 중복확인
         if (memberOptional.isPresent()) {
-            throw new IllegalArgumentException("중복된 이메일이 있습니다");
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         Member member = Member.builder()
@@ -72,24 +71,30 @@ public class MemberService {
                 .build();
 
         memberRepository.save(member);
+        return ResponseEntity.ok()
+                .body(MessageDto.of(SuccessCode.SIGNUP_SUCCESS));
+
     }
 
-    public void login(MemberDto.loginRequestDto loginRequest, HttpServletResponse response) {
+    public ResponseEntity<MessageDto> login(MemberDto.loginRequestDto loginRequest, HttpServletResponse response) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
 
         Optional<Member> memberOptional = memberRepository.findByEmail(email);
         if (memberOptional.isEmpty()) {
-            throw new IllegalArgumentException("아이디가 없습니다.");
+            throw new CustomException(ErrorCode.UNREGISTER_EMAIL);
         }
 
         if (!password.equals(memberOptional.get().getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(memberOptional.get().getEmail(), memberOptional.get().getRole()));
+
+        return ResponseEntity.ok()
+                .body(MessageDto.of(SuccessCode.LOGIN_SUCCESS));
     }
 
-    public String kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<MessageDto> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
 
@@ -103,7 +108,8 @@ public class MemberService {
         String createToken = jwtUtil.createToken(kakaoUser.getEmail(), kakaoUser.getRole());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
-        return createToken;
+        return ResponseEntity.ok()
+                .body(MessageDto.of(SuccessCode.LOGIN_SUCCESS));
     }
 
     // 1. "인가 코드"로 "액세스 토큰" 요청
@@ -183,7 +189,7 @@ public class MemberService {
                 // 신규 회원가입
                 // password: random UUID
                 String password = UUID.randomUUID().toString();
-//                String encodedPassword = passwordEncoder.encode(password);
+                String encodedPassword = passwordEncoder.encode(password);
                 String nickName = " ";
                 while (true) {
                     nickName = randomNicknameBox.GetPrefix() + " " + randomNicknameBox.GetSuffix();
