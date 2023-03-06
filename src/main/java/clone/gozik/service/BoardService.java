@@ -3,6 +3,7 @@ package clone.gozik.service;
 import clone.gozik.S3.S3Uploader;
 import clone.gozik.dto.*;
 import clone.gozik.entity.*;
+import clone.gozik.exception.CustomException;
 import clone.gozik.repository.BoardRepository;
 import clone.gozik.repository.JobRepository;
 import clone.gozik.repository.MemberRepository;

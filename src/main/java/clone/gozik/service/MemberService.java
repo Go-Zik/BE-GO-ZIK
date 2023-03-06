@@ -3,6 +3,7 @@ package clone.gozik.service;
 import clone.gozik.dto.MemberDto;
 import clone.gozik.dto.MessageDto;
 import clone.gozik.entity.*;
+import clone.gozik.exception.CustomException;
 import clone.gozik.jwt.JwtUtil;
 import clone.gozik.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
