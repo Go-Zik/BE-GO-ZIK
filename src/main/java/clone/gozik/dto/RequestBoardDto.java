@@ -8,17 +8,12 @@ import java.util.List;
 
 @Getter
 public class RequestBoardDto {
-    @Nullable
     private String title;
-    @Nullable
     private String description;
-    @Nullable
     private String companytype;
-    @Nullable
     private String startdate;
+    @Nullable
     private String enddate;
-    @Nullable
     private boolean recruitmentperiod;
-    @Nullable
     private List<RequestJobDto> job;
 }
