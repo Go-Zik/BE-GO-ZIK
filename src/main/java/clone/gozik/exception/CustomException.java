@@ -1,5 +1,6 @@
-package clone.gozik.entity;
+package clone.gozik.exception;
 
+import clone.gozik.entity.ErrorCode;
 import lombok.Getter;
 
 @Getter

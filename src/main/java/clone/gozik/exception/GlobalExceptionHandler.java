@@ -1,6 +1,7 @@
-package clone.gozik.entity;
+package clone.gozik.exception;
 
 import clone.gozik.dto.MessageDto;
+import clone.gozik.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

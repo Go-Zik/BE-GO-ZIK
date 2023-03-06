@@ -3,8 +3,9 @@ package clone.gozik.dto;
 import clone.gozik.entity.ErrorCode;
 import clone.gozik.entity.SuccessCode;
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.http.ResponseEntity;
-
+@Getter
 public class MessageDto {
     private String message;
     private int statusCode;
