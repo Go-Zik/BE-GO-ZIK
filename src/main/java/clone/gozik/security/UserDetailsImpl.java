@@ -22,7 +22,9 @@ public class UserDetailsImpl implements UserDetails {
     public Member getUser() {
         return member;
     }
-
+    public String getEmail() {
+        return email;
+    }
 
 
     @Override

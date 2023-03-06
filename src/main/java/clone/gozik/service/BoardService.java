@@ -3,10 +3,12 @@ package clone.gozik.service;
 import clone.gozik.S3.S3Uploader;
 import clone.gozik.dto.*;
 import clone.gozik.entity.*;
+import clone.gozik.exception.CustomException;
 import clone.gozik.repository.BoardRepository;
 import clone.gozik.repository.JobRepository;
 import clone.gozik.repository.MemberRepository;
 import clone.gozik.repository.LogoAndImageRepository;
+import clone.gozik.security.UserDetailsImpl;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import static clone.gozik.entity.ErrorCode.NULL_BOARD_DATA;
+import static clone.gozik.entity.ErrorCode.UNREGISTER_EMAIL;
 
 @Service
 @RequiredArgsConstructor
@@ -205,7 +210,7 @@ public class BoardService {
             throw new CustomException(ErrorCode.NOT_RECRUIT_TYPE);
         }
         return ResponseEntity.ok()
-                .body(MessageDto.of(SuccessCode.BLOG_DELETE_SUCCESS));
+                .body(MessageDto.of(SuccessCode.BLOG_END_SUCCESS));
     }
 
     private LocalDate extractDate(String date){
@@ -213,4 +218,11 @@ public class BoardService {
     }
 
 
+    public ResponseEntity<MessageDto> delete(Long id, UserDetailsImpl userDetails) {
+        Member member = memberrepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+        boardRepository.findByIdAndMember(id,member).orElseThrow(()->new CustomException(NULL_BOARD_DATA));
+        boardRepository.deleteById(id);
+        return ResponseEntity.ok()
+                .body(MessageDto.of(SuccessCode.BLOG_DELETE_SUCCESS));
+    }
 }
