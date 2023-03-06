@@ -8,6 +8,7 @@ import clone.gozik.repository.BoardRepository;
 import clone.gozik.repository.JobRepository;
 import clone.gozik.repository.MemberRepository;
 import clone.gozik.repository.LogoAndImageRepository;
+import clone.gozik.security.UserDetailsImpl;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import static clone.gozik.entity.ErrorCode.NULL_BOARD_DATA;
+import static clone.gozik.entity.ErrorCode.UNREGISTER_EMAIL;
 
 @Service
 @RequiredArgsConstructor
@@ -84,12 +88,9 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<MessageDto> createBoard(RequestBoardDto requestBoardDto, MultipartFile image, MultipartFile logo) {
-        //임시 코드 1 > 구현시 모두 제거
-        String nickname = "임시닉네임 로그인구현시 변경";
-        Member member = new Member();//임시멤버, 멤버 리포지토리 구현시 제거
-        //임시코드1은 여기까지
-        //파일 저장하며 url 받아오기
+    public ResponseEntity<MessageDto> createBoard(RequestBoardDto requestBoardDto, MultipartFile image, MultipartFile logo,UserDetailsImpl userDetails) {
+        Member member = memberrepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+        String nickname = member.getNickName();
         Board board = null;
         String imageurl = "";
         String logourl = "";
@@ -128,12 +129,9 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<MessageDto> updateBoard(Long id, RequestBoardDto boardRequestDto, MultipartFile image, MultipartFile logo) {
+    public ResponseEntity<MessageDto> updateBoard(Long id, RequestBoardDto boardRequestDto, MultipartFile image, MultipartFile logo,UserDetailsImpl userDetails) {
         Board board =  boardRepository.findById(id).orElseThrow(()->new IllegalArgumentException("글이 존재하지 않습니다"));
-        //임시 코드 2 > 구현시 모두 제거
-        String nickname = "임시닉네임 로그인구현시 변경";
-        Member member = new Member();//임시멤버, 멤버 리포지토리 구현시 제거
-        //임시코드2는 여기까지
+        Member member = memberrepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
         String imageurl = "";
         String logourl = "";
 
@@ -144,8 +142,6 @@ public class BoardService {
         }
         LogoAndImage logoAndImage = logoAndImageRepository.findByBoardId(id)
                 .orElseThrow(()->new CustomException(ErrorCode.NULL_IMAGE_DATA));
-
-
 
         List<String> logodata = new ArrayList<>();
         List<String> imagedata = new ArrayList<>();
@@ -197,16 +193,16 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<MessageDto> doneBoard(Long id) {
-        Board board= boardRepository.findById(id).orElseThrow(
-                ()->new CustomException(ErrorCode.NULL_BOARD_DATA));
+    public ResponseEntity<MessageDto> doneBoard(Long id,UserDetailsImpl userDetails) {
+        Member member = memberrepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+        Board board= boardRepository.findByIdAndMember(id,member).orElseThrow(()->new CustomException(ErrorCode.NULL_BOARD_DATA));
         if(board.getRecruitmentperiod()== RecruitTypeEnum.ONGOING)
             board.closed();
         else{
             throw new CustomException(ErrorCode.NOT_RECRUIT_TYPE);
         }
         return ResponseEntity.ok()
-                .body(MessageDto.of(SuccessCode.BLOG_DELETE_SUCCESS));
+                .body(MessageDto.of(SuccessCode.BLOG_END_SUCCESS));
     }
 
     private LocalDate extractDate(String date){
@@ -214,4 +210,11 @@ public class BoardService {
     }
 
 
+    public ResponseEntity<MessageDto> delete(Long id, UserDetailsImpl userDetails) {
+        Member member = memberrepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+        boardRepository.findByIdAndMember(id,member).orElseThrow(()->new CustomException(NULL_BOARD_DATA));
+        boardRepository.deleteById(id);
+        return ResponseEntity.ok()
+                .body(MessageDto.of(SuccessCode.BLOG_DELETE_SUCCESS));
+    }
 }

@@ -86,7 +86,7 @@ public class MemberService {
             throw new CustomException(ErrorCode.UNREGISTER_EMAIL);
         }
 
-        if (!password.equals(memberOptional.get().getPassword())) {
+        if (!passwordEncoder.matches(password,memberOptional.get().getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(memberOptional.get().getEmail(), memberOptional.get().getRole()));

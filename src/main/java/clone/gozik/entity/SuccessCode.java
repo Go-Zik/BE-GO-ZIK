@@ -12,6 +12,7 @@ public enum SuccessCode {
 
     BLOG_POST_SUCCESS(HttpStatus.OK,"게시글 작성 성공"),
     BLOG_PUT_SUCCESS(HttpStatus.OK,"게시글 수정 성공"),
+    BLOG_END_SUCCESS(HttpStatus.OK,"게시글 마감 성공"),
     BLOG_DELETE_SUCCESS(HttpStatus.OK,"게시글 삭제 성공"),
 
     LIKE_SUCCESS(HttpStatus.OK, "즐겨찾기 선택"),
