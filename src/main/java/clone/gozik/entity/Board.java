@@ -70,8 +70,8 @@ public class Board {
         this.viewCount = 0;
         this.member = member;
         this.recruitmentperiod = RecruitTypeEnum.OPEN;
-        this.logo=getLogo();
-        this.image=getImage();
+        this.logo=logo;
+        this.image=image;
         this.companyType = switch (requestBoardDto.getCompanytype()){
             case "대기업" -> BIG;
             case "중견기업" ->MIDDLE;
