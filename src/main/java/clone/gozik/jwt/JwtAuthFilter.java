@@ -47,7 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     public void setAuthentication(String email) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtUtil.createAuthentication(email);
-        System.out.println();
+        System.out.println("setA 들어왔는가");
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);

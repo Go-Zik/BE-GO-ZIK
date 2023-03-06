@@ -19,10 +19,10 @@ public class MemberDetailsImpl implements UserDetails {
     public Member getMember() {
         return member;
     }
-//
-//    public String getEmail() {
-//        return email;
-//    }
+
+    public String getEmail() {
+        return email;
+    }
 
 
 //    @Override

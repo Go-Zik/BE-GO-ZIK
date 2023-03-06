@@ -8,6 +8,7 @@ import clone.gozik.repository.MemberRepository;
 import clone.gozik.security.MemberDetailsImpl;
 import clone.gozik.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +52,7 @@ public class BoardController {
 
     @PostMapping("/recurit/idcheck")
     public String idcheck(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        System.out.println(memberDetails.getEmail());
         String ans = "실행시작";
         System.out.println("왜안돼냐");
         Member member = memberRepository.findMemberByEmail(memberDetails.getMember().getEmail()).orElseThrow(

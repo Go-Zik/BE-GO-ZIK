@@ -12,6 +12,7 @@ import clone.gozik.security.MemberDetailsImpl;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +41,7 @@ public class BoardService {
 
     private final LogoAndImageRepository logoAndImageRepository;
 
+    @Autowired
     private final S3Uploader s3Uploader;
 
     @Value("gozik")
