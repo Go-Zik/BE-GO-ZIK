@@ -21,7 +21,8 @@ public class Favorites {
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-//    public Favorites(responseDto){
-//
-//    }
+    public Favorites(Member member, Board board) {
+        this.member = member;
+        this.board = board;
+    }
 }
