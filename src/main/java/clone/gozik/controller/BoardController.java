@@ -46,7 +46,6 @@ public class BoardController {
                     @RequestPart(value = "data") RequestBoardDto requestBoardDto,
                     @RequestPart(value = "image") MultipartFile image,
                     @RequestPart(value = "logo") MultipartFile logo){
-        System.out.println("보드 제작중");
         return boardService.createBoard(memberDetails,requestBoardDto,image,logo);
     }
 
