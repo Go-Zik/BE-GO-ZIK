@@ -88,9 +88,10 @@ public class BoardService {
         return boardResponse;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public OneBoardResponseDto getBoard(Long id) {
-        Board board = boardRepository.findById(id).orElseThrow(()->new IllegalArgumentException("글이 존재하지 않습니다"));
+        Board board = boardRepository.findAndLockById(id);//.orElseThrow(()->new IllegalArgumentException("글이 존재하지 않습니다"));
+        boardRepository.viewBoard(id);
         List<Job> jobList = jobRepository.findByBoard(board);
         List<OneJobResponseDto> jobResponse = new ArrayList<>();
         for (Job job : jobList) {
