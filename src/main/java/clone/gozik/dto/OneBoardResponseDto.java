@@ -1,10 +1,11 @@
 package clone.gozik.dto;
 
 import clone.gozik.entity.Board;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.List;
-
+@Getter
 public class OneBoardResponseDto {
     private String title;
     private String description;
