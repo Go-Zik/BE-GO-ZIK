@@ -7,11 +7,11 @@ import lombok.Getter;
 
 @Getter
 public class OneJobResponseDto {
-    private EmployeeType imcruitType;
+    private EmployeeType incruitType;
     private String jobDetail;
 
     public OneJobResponseDto(Job job) {
-        this.imcruitType = job.getIncruittype();
+        this.incruitType = job.getIncruittype();
         this.jobDetail = job.getJobDetail();
     }
 }
