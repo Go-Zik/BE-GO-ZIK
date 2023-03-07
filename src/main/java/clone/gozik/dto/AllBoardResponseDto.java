@@ -1,7 +1,6 @@
 package clone.gozik.dto;
 
 import clone.gozik.entity.Board;
-import clone.gozik.entity.CompanyTypeEnum;
 import clone.gozik.entity.RecruitTypeEnum;
 import lombok.Getter;
 
@@ -15,7 +14,7 @@ public class AllBoardResponseDto {
     private LocalDate startDate;
     private LocalDate lastDate;
     private RecruitTypeEnum recruitmentPeriod;
-    private CompanyTypeEnum companyType;
+    private String companyType;
 
     private Integer viewCount;
 
@@ -27,7 +26,7 @@ public class AllBoardResponseDto {
         this.startDate = board.getStartDate();
         this.lastDate = board.getLastDate();
         this.recruitmentPeriod = board.getRecruitmentperiod();
-//        this.companyType = board.getCompanyType();
+        this.companyType = board.getCompanyType();
         this.viewCount = board.getViewCount();
         this.incruteType = incruteType;
     }
