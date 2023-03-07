@@ -37,6 +37,7 @@ public class Job {
             case "CONTRACT" -> CONTRACT;
             default -> throw new IllegalArgumentException("채용 형태를 확인해주세요" );
         };
+        this.jobDetail = requestJobDto.getJobdetail();
         this.board = board;
     }
 }

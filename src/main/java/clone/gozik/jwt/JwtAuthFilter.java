@@ -29,6 +29,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String token = jwtUtil.resolveToken(request);
+        System.out.println("token = " + token);
 
         if(token != null) {
             if(!jwtUtil.validateToken(token)){
@@ -36,6 +37,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
             Claims info = jwtUtil.getUserInfoFromToken(token);
+            System.out.println("token = " + token);
+            System.out.println("info = " + info);
             setAuthentication(info.getSubject());
         }
         filterChain.doFilter(request,response);
@@ -44,6 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     public void setAuthentication(String email) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtUtil.createAuthentication(email);
+        System.out.println("setA 들어왔는가");
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);

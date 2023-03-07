@@ -15,5 +15,9 @@ public class RequestBoardDto {
     @Nullable
     private String enddate;
     private boolean recruitmentperiod;
+    @Nullable
     private List<RequestJobDto> job;
+
+
+
 }

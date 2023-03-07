@@ -5,6 +5,8 @@ import clone.gozik.entity.SuccessCode;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
+
+
 @Getter
 public class MessageDto {
     private String message;

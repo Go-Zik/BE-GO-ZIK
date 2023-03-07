@@ -10,7 +10,7 @@ import clone.gozik.repository.BoardRepository;
 import clone.gozik.repository.FavoritesRepository;
 import clone.gozik.repository.JobRepository;
 import clone.gozik.repository.MemberRepository;
-import clone.gozik.security.UserDetailsImpl;
+import clone.gozik.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,9 +32,9 @@ public class FavoritesService {
 
 
     @Transactional
-    public MessageDto doOrCancle(UserDetailsImpl userDetails, Long boardid) {
+    public MessageDto doOrCancle(MemberDetailsImpl memberDetails, Long boardid) {
 
-        Member member = memberRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
+        Member member = memberRepository.findByEmail(memberDetails.getMember().getEmail()).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_AUTHOR)
         );
 
@@ -79,9 +79,9 @@ public class FavoritesService {
         return boardAndCount;
     }
     @Transactional
-    public List getmembersfavor(UserDetailsImpl userDetails) {
+    public List getmembersfavor(MemberDetailsImpl memberDetails) {
 
-        List<Favorites> membersfavors = favoritesRepository.findAllByMember_Id(userDetails.getUser().getId());
+        List<Favorites> membersfavors = favoritesRepository.findAllByMember_Id(memberDetails.getMember().getId());
 
         List<AllBoardResponseDto> memberfavorboards = new ArrayList<>();
         for (Favorites i : membersfavors) {

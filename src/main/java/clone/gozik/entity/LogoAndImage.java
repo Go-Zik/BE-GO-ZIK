@@ -16,7 +16,8 @@ public class LogoAndImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "logoAndImage_id")
+//    @Column(name = "logoAndImage_id")
+    @Column
     private long id;
 
     @Column(length = 1000, nullable = true)
