@@ -32,10 +32,10 @@ public class S3Uploader {
 
         try{
             File uploadFile = convert(multipartFile)
-                    .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
+                    .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패try줄"));
             return upload(uploadFile,dirName);
         }catch (IOException e){
-            throw new IllegalArgumentException("MultipartFile -> File 전환 실패");
+            throw new IllegalArgumentException("MultipartFile -> File 전환 실패catch줄");
         }
 
     }

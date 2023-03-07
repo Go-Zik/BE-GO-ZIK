@@ -50,7 +50,7 @@ public class BoardController {
         return boardService.createBoard(memberDetails,requestBoardDto,image,logo);
     }
 
-    @GetMapping("/recurit/idcheck")
+    @PostMapping("/recruit/idcheck")
     public String idcheck(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
         System.out.println(memberDetails.getEmail());
         String ans = "실행시작";

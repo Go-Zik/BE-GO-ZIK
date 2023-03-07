@@ -27,14 +27,14 @@ public class FavoritesController {
     }
 
     //게시글을 즐겨찾기 한 사람의 수
-    @GetMapping("/{boardid}")
+    @GetMapping("/board/{boardid}")
     public int favoirtescount(@PathVariable Long boardid){
         return favoritesService.favorites(boardid);
     }
 
 
     //모든 게시글의 게시글 당 즐겨찾기한 사람 수 조회하기
-    @GetMapping("/all")
+    @GetMapping("/board/all")
     public HashMap<Long,Long> getallboardfavor(){
         return favoritesService.allfavor();
     }
