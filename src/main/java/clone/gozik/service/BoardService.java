@@ -4,10 +4,7 @@ import clone.gozik.S3.S3Uploader;
 import clone.gozik.dto.*;
 import clone.gozik.entity.*;
 import clone.gozik.exception.CustomException;
-import clone.gozik.repository.BoardRepository;
-import clone.gozik.repository.JobRepository;
-import clone.gozik.repository.MemberRepository;
-import clone.gozik.repository.LogoAndImageRepository;
+import clone.gozik.repository.*;
 import clone.gozik.security.MemberDetailsImpl;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -43,6 +40,8 @@ public class BoardService {
     private final MemberRepository memberrepository;
 
     private final LogoAndImageRepository logoAndImageRepository;
+
+    private final FavoritesRepository favoritesRepository;
 
     @Autowired
     private final S3Uploader s3Uploader;
@@ -97,7 +96,8 @@ public class BoardService {
         for (Job job : jobList) {
             jobResponse.add(new OneJobResponseDto(job));
         }
-        OneBoardResponseDto boardResponse = new OneBoardResponseDto(board,jobResponse);
+        Integer fav =favoritesRepository.countByBoard(board);
+        OneBoardResponseDto boardResponse = new OneBoardResponseDto(board,jobResponse,fav);
         return boardResponse;
     }
 

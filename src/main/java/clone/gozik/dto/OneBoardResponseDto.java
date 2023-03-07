@@ -15,8 +15,10 @@ public class OneBoardResponseDto {
     private List job;
     private String image;
     private String logo;
+    private Integer viewcount;
+    private Integer favorite;
 
-    public OneBoardResponseDto(Board board, List job) {
+    public OneBoardResponseDto(Board board, List job,Integer favorite) {
         this.title = board.getTitle();
         this.description = board.getDescription();
         this.nickname = board.getNickname();
@@ -25,5 +27,7 @@ public class OneBoardResponseDto {
         this.job = job;
         this.image = board.getImage();
         this.logo = board.getLogo();
+        this.viewcount= board.getViewCount();
+        this.favorite=favorite;
     }
 }
