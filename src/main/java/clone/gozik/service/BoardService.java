@@ -248,7 +248,39 @@ public class BoardService {
     public ResponseEntity<MessageDto> delete(Long id, MemberDetailsImpl memberDetails) {
         Member member = memberrepository.findByEmail(memberDetails.getMember().getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
         boardRepository.findByIdAndMember(id,member).orElseThrow(()->new CustomException(NULL_BOARD_DATA));
+
+
+        //S3의 이미지와 로고 데이터 삭제
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withRegion(region).build();
+        LogoAndImage logoAndImage = logoAndImageRepository.findByBoardId(id)
+                .orElseThrow(()->new CustomException(ErrorCode.NULL_IMAGE_DATA));
+
+        System.out.println("엔티티다 찾음");
+        String deletelogokey = logoAndImage.getLogoKey();
+        if (!deletelogokey.equals("")){
+            try{
+                s3.deleteObject(bucket,deletelogokey);
+                System.out.println("로고삭제성공");
+            }catch (Exception e){
+                throw new CustomException(ErrorCode.NULL_IMAGE_DATA);
+            }
+        }
+        String deleteimagekey = logoAndImage.getImageKey();
+        if (!deleteimagekey.equals("")){
+            try{
+                s3.deleteObject(bucket,deleteimagekey);
+                System.out.println("이미지삭제 성공");
+            }catch (Exception e){
+                throw new CustomException(ErrorCode.NULL_IMAGE_DATA);
+            }
+        }
+
         boardRepository.deleteById(id);
+
+
+
         return ResponseEntity.ok()
                 .body(MessageDto.of(SuccessCode.BLOG_DELETE_SUCCESS));
     }
