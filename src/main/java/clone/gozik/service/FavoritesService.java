@@ -69,8 +69,10 @@ public class FavoritesService {
         HashMap<Long, Long> boardAndCount = new HashMap<>();
 
         for (Favorites i : allfavors) {
+            System.out.println("i.getBoard().getId() = " + i.getBoard().getId());
             if (boardAndCount.containsKey(i.getBoard().getId())){
-                boardAndCount.put(i.getBoard().getId(),boardAndCount.get(i.getBoard().getId()+1));
+                System.out.println("boardAndCount = " + boardAndCount.get(i.getBoard().getId()));
+                boardAndCount.put(i.getBoard().getId(),boardAndCount.get(i.getBoard().getId())+1);
             }else {
                 boardAndCount.put(i.getBoard().getId(),1L);
             }
