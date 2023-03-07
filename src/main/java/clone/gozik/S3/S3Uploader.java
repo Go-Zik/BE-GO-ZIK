@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -53,7 +55,7 @@ public class S3Uploader {
 
     private ArrayList<String> upload(File uploadFile, String dirName){
 
-        String fileName = dirName +"/" +uploadFile.getName();
+        String fileName = dirName +"/" +uploadFile.getName() + LocalDateTime.now();
         log.info("key : "+fileName);
 
         String uploadImageUrl = putS3(uploadFile,fileName);

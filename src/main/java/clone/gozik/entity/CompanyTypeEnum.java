@@ -3,10 +3,10 @@ package clone.gozik.entity;
 
 public enum CompanyTypeEnum {
 
-    BIG(Authority.BIG),
-    MIDDLE(Authority.MIDDLE),
-    PUBLIC(Authority.PUBLIC),
-    ECT(Authority.ECT);
+    BIG(Authority.BIG), //대기업
+    MIDDLE(Authority.MIDDLE), //중견기업
+    PUBLIC(Authority.PUBLIC), //공공기관
+    ECT(Authority.ECT); //기타
 
     private final String authority;
 

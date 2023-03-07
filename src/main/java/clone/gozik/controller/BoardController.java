@@ -50,27 +50,7 @@ public class BoardController {
         return boardService.createBoard(memberDetails,requestBoardDto,image,logo);
     }
 
-    @PostMapping("/recruit/idcheck")
-    public String idcheck(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        System.out.println(memberDetails.getEmail());
-        String ans = "실행시작";
-        System.out.println("왜안돼냐");
-        Member member = memberRepository.findMemberByEmail(memberDetails.getMember().getEmail()).orElseThrow(
-                () -> new IllegalArgumentException("왜안돼")
-                );
-        ans = member.getEmail();
-        return ans;
-    }
-
-    @PostMapping("/testtest")
-    public String test(){
-        return "성공하는듯";
-    }
-
-
-
-
-    @PostMapping("/recruit/{id}")
+    @PutMapping("/recruit/{id}")
     public ResponseEntity<MessageDto> recruitupdate(
             @PathVariable Long id,
             @RequestPart(value = "data") RequestBoardDto boardRequestDto,
@@ -82,7 +62,7 @@ public class BoardController {
         return boardService.updateBoard(id,boardRequestDto,image,logo,memberDetails);
     }
 
-    @PutMapping("/recruit/{id}")
+    @PutMapping("/recruit/endday/{id}")
     public ResponseEntity<MessageDto> recruitdone(
             @PathVariable Long id
             ,@AuthenticationPrincipal MemberDetailsImpl memberDetails

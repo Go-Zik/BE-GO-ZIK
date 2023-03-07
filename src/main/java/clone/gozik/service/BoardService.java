@@ -9,6 +9,9 @@ import clone.gozik.repository.JobRepository;
 import clone.gozik.repository.MemberRepository;
 import clone.gozik.repository.LogoAndImageRepository;
 import clone.gozik.security.MemberDetailsImpl;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
@@ -44,11 +47,19 @@ public class BoardService {
     @Autowired
     private final S3Uploader s3Uploader;
 
-    @Value("gozik")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Value("ap-northeast-2")
+    @Value("${cloud.aws.region.static}")
     private String region;
+
+    @Value("${cloud.aws.credentials.accessKey}")
+    private String accessKey;
+
+
+    @Value("${cloud.aws.credentials.secretKey}")
+    private String secretKey;
+
 
     @Transactional(readOnly = true)
     public List mainBoard() {
@@ -147,12 +158,25 @@ public class BoardService {
 
         List<String> logodata = new ArrayList<>();
         List<String> imagedata = new ArrayList<>();
-        if (logo.equals(null)){ //로고를 없애고 싶은 경우
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withRegion(region).build();
+
+        if (logo.isEmpty()){ //로고를 없애고 싶은 경우
             logourl = "";
+            String deletelogokey = logoAndImage.getLogoKey();
+            try{
+                s3.deleteObject(bucket,deletelogokey);
+            }catch (Exception e){
+                throw new CustomException(ErrorCode.NULL_IMAGE_DATA);
+            }
+            logoAndImage.setLogoKey("");
+            logoAndImage.setLogoUrl("");
         }else {                 //로고를 바꾸거나 원래 있었던 걸로 하고 싶은 경우
             //기존 logo 파일 삭제
             String deletelogokey = logoAndImage.getLogoKey();
-            final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(region).build();
+            System.out.println(deletelogokey);
+
             try{
                 s3.deleteObject(bucket,deletelogokey);
             }catch (Exception e){
@@ -164,12 +188,20 @@ public class BoardService {
             logourl = logodata.get(1);
         }
 
-        if (image.equals(null)){ //이미지를 없애고 싶은 경우
+
+        if (image.isEmpty()){ //이미지를 없애고 싶은 경우
             imageurl = "";
+            String deletelogokey = logoAndImage.getImageKey();
+            try{
+                s3.deleteObject(bucket,deletelogokey);
+            }catch (Exception e){
+                throw new CustomException(ErrorCode.NULL_IMAGE_DATA);
+            }
+            logoAndImage.setImageKey("");
+            logoAndImage.setImageUrl("");
         }else {                 //이미지를 바꾸거나 원래 있었던 걸로 하고 싶은 경우
             //기존 image 파일 삭제
             String deleteimagekey = logoAndImage.getImageKey();
-            final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(region).build();
             try{
                 s3.deleteObject(bucket,deleteimagekey);
             }catch (Exception e){
@@ -187,7 +219,7 @@ public class BoardService {
             boardRepository.save(board);
         }else{
             LocalDate lastDate = extractDate(boardRequestDto.getEnddate());
-             board.update(boardRequestDto,lastDate,startDate,member,imageurl,logourl);
+            board.update(boardRequestDto,lastDate,startDate,member,imageurl,logourl);
             boardRepository.save(board);
         }
         return ResponseEntity.ok()
