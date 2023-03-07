@@ -60,8 +60,6 @@ public class Board {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<Favorites> favorites;
-
-
     //상시채용이 아닐경우 lastdate를 확인하여 넣어줌
     public Board(RequestBoardDto requestBoardDto, String nickname,LocalDate lastDate, LocalDate startDate, Member member,String image,String logo) {
         this.title = requestBoardDto.getTitle();
@@ -115,4 +113,5 @@ public class Board {
         this.image=image;
         this.companyType = requestBoardDto.getCompanytype();
     }
+//    public void viewBoard(){this.viewCount++;}
 }
