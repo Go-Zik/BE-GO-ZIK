@@ -1,6 +1,5 @@
 package clone.gozik.dto;
 
-import clone.gozik.entity.CompanyTypeEnum;
 import lombok.Getter;
 import org.springframework.lang.Nullable;
 
