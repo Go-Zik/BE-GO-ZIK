@@ -52,10 +52,10 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public List mainBoard() {
-       Pageable mainpage = PageRequest.of(1,27);
-       Page<Board> boardList = boardRepository.findAll(mainpage);
+       Pageable mainpage = PageRequest.of(0,24);
+       Page<Board> boardlist = boardRepository.findAllByOrderByIdDesc(mainpage);
        List<MainBoardResponseDto> boardResponse = new ArrayList<>();
-        for (Board board : boardList) {
+        for (Board board : boardlist) {
             boardResponse.add(new MainBoardResponseDto(board));
         }
         return boardResponse;
