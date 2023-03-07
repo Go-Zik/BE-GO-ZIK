@@ -36,7 +36,7 @@ public class LogoAndImage {
 
 
     @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "board_id")
+    @JoinColumn(name = "board_id")
     private Board board;
 
     public LogoAndImage(List<String>logodata, List<String>imagedata, Board board) {

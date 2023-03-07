@@ -58,6 +58,10 @@ public class Board {
     @OneToOne(mappedBy = "board", cascade = CascadeType.REMOVE)
     private LogoAndImage logoAndImage;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<Favorites> favorites;
+
+
     //상시채용이 아닐경우 lastdate를 확인하여 넣어줌
     public Board(RequestBoardDto requestBoardDto, String nickname,LocalDate lastDate, LocalDate startDate, Member member,String image,String logo) {
         this.title = requestBoardDto.getTitle();
