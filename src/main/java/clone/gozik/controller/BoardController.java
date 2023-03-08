@@ -76,4 +76,8 @@ public class BoardController {
     ){
         return boardService.delete(id, memberDetails);
     }
+    @GetMapping("/recruit/recent")
+    public List recruitrecent(){
+        return boardService.recent();
+    }
 }

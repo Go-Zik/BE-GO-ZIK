@@ -284,4 +284,14 @@ public class BoardService {
         return ResponseEntity.ok()
                 .body(MessageDto.of(SuccessCode.BLOG_DELETE_SUCCESS));
     }
+
+    public List recent() {
+        Pageable recentpage = PageRequest.of(0,6);
+        Page<Board> boardlist = boardRepository.findAllByOrderByIdDesc(recentpage);
+        List<RecentBoardResponseDto> boardResponse = new ArrayList<>();
+        for (Board board : boardlist) {
+            boardResponse.add(new RecentBoardResponseDto(board));
+        }
+        return boardResponse;
+    }
 }
