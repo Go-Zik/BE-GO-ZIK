@@ -10,8 +10,8 @@ public class OneBoardResponseDto {
     private String title;
     private String description;
     private String nickname;
-    private LocalDate startDate;
-    private LocalDate lastDate;
+    private LocalDate startdate;
+    private LocalDate lastdate;
     private List job;
     private String image;
     private String logo;
@@ -22,8 +22,8 @@ public class OneBoardResponseDto {
         this.title = board.getTitle();
         this.description = board.getDescription();
         this.nickname = board.getNickname();
-        this.startDate = board.getStartDate();
-        this.lastDate = board.getLastDate();
+        this.startdate = board.getStartDate();
+        this.lastdate = board.getLastDate();
         this.job = job;
         this.image = board.getImage();
         this.logo = board.getLogo();
