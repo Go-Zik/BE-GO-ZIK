@@ -17,8 +17,9 @@ public class OneBoardResponseDto {
     private String logo;
     private Integer viewcount;
     private Integer favorite;
+    private Boolean hasfav;
 
-    public OneBoardResponseDto(Board board, List job,Integer favorite) {
+    public OneBoardResponseDto(Board board, List job,Integer favorite,Boolean hasfav) {
         this.title = board.getTitle();
         this.description = board.getDescription();
         this.nickname = board.getNickname();
@@ -29,5 +30,6 @@ public class OneBoardResponseDto {
         this.logo = board.getLogo();
         this.viewcount= board.getViewCount();
         this.favorite=favorite;
+        this.hasfav=hasfav;
     }
 }
