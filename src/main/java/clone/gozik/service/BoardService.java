@@ -66,7 +66,12 @@ public class BoardService {
        Page<Board> boardlist = boardRepository.findAllByOrderByIdDesc(mainpage);
        List<MainBoardResponseDto> boardResponse = new ArrayList<>();
         for (Board board : boardlist) {
-            boardResponse.add(new MainBoardResponseDto(board));
+            try{
+            List<Job> job = jobRepository.findByBoard(board);
+            boardResponse.add(new MainBoardResponseDto(board,job.get(0)));}
+            catch (IndexOutOfBoundsException e){
+                boardResponse.add(new MainBoardResponseDto(board));
+            }
         }
         return boardResponse;
     }
