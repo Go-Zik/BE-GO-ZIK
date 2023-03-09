@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static clone.gozik.entity.ErrorCode.*;
 
@@ -87,7 +88,19 @@ public class BoardService {
     }
 
     @Transactional
-    public OneBoardResponseDto getBoard(Long id) {
+    public OneBoardResponseDto getBoard(Long id,MemberDetailsImpl memberDetails) {
+        Member member = null;
+        Boolean hasfav = false;
+        if(memberDetails!=null){
+            member=memberrepository.findByEmail(memberDetails.getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+            Optional<Favorites> fav =  favoritesRepository.findByBoardIdAndMember_Id(id,member.getId());
+            if(fav.isEmpty())
+            {
+                hasfav=false;
+            }else if(fav.isPresent()){
+                hasfav=true;
+            }
+        }
         Board board = boardRepository.findAndLockById(id);//.orElseThrow(()->new IllegalArgumentException("글이 존재하지 않습니다"));
         boardRepository.viewBoard(id);
         List<Job> jobList = jobRepository.findByBoard(board);
@@ -96,7 +109,7 @@ public class BoardService {
             jobResponse.add(new OneJobResponseDto(job));
         }
         Integer fav =favoritesRepository.countByBoard(board);
-        OneBoardResponseDto boardResponse = new OneBoardResponseDto(board,jobResponse,fav);
+        OneBoardResponseDto boardResponse = new OneBoardResponseDto(board,jobResponse,fav,hasfav);
         return boardResponse;
     }
 

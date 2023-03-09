@@ -37,8 +37,10 @@ public class BoardController {
     }
 
     @GetMapping("/recruit/{id}")
-    public OneBoardResponseDto recruitgetone(@PathVariable Long id){
-        return boardService.getBoard(id);
+    public OneBoardResponseDto recruitgetone(@PathVariable Long id
+    ,@AuthenticationPrincipal MemberDetailsImpl memberDetails
+    ) {
+        return boardService.getBoard(id,memberDetails);
     }
 
     @PostMapping("/recruit")
@@ -51,11 +53,11 @@ public class BoardController {
 
     @PutMapping("/recruit/{id}")
     public ResponseEntity<MessageDto> recruitupdate(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @PathVariable Long id,
             @RequestPart(value = "data") RequestBoardDto boardRequestDto,
             @RequestPart(value = "image") MultipartFile image,
             @RequestPart(value = "logo") MultipartFile logo
-            ,@AuthenticationPrincipal MemberDetailsImpl memberDetails
     )throws IOException {
 
         return boardService.updateBoard(id,boardRequestDto,image,logo,memberDetails);
