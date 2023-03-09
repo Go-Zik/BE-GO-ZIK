@@ -27,8 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static clone.gozik.entity.ErrorCode.NULL_BOARD_DATA;
-import static clone.gozik.entity.ErrorCode.UNREGISTER_EMAIL;
+import static clone.gozik.entity.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -146,6 +145,10 @@ public class BoardService {
     public ResponseEntity<MessageDto> updateBoard(Long id, RequestBoardDto boardRequestDto, MultipartFile image, MultipartFile logo, MemberDetailsImpl memberDetails) {
         Board board =  boardRepository.findById(id).orElseThrow(()->new IllegalArgumentException("글이 존재하지 않습니다"));
         Member member = memberrepository.findByEmail(memberDetails.getMember().getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
+        if(!board.getNickname().equals(member.getNickName()))
+        {
+            throw new CustomException(NOT_AUTHOR);
+        }
         String imageurl = "";
         String logourl = "";
 
@@ -248,7 +251,6 @@ public class BoardService {
     public ResponseEntity<MessageDto> delete(Long id, MemberDetailsImpl memberDetails) {
         Member member = memberrepository.findByEmail(memberDetails.getMember().getEmail()).orElseThrow(()->new CustomException(UNREGISTER_EMAIL));
         boardRepository.findByIdAndMember(id,member).orElseThrow(()->new CustomException(NULL_BOARD_DATA));
-
 
         //S3의 이미지와 로고 데이터 삭제
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
